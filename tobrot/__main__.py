@@ -1,10 +1,8 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# (c) Shrimadhav U K | gautamajay52
-
 import logging
 import os
 import sys
+import ntplib
+from time import ctime
 
 from pyrogram import Client, filters, idle
 from pyrogram.handlers import CallbackQueryHandler, MessageHandler
@@ -61,6 +59,17 @@ from tobrot.plugins.status_message_fn import (
     upload_as_doc,
     upload_as_video
 )
+
+def synchronize_time():
+    try:
+        ntp_client = ntplib.NTPClient()
+        response = ntp_client.request('pool.ntp.org')
+        current_time = response.tx_time
+        # Set the system time to the current time from the NTP server
+        os.system(f'date {ctime(current_time)}')
+        print("Time synchronized successfully!")
+    except Exception as e:
+        print("Failed to synchronize time:", e)
 
 def start_bot():
     try:
@@ -127,6 +136,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     try:
+        synchronize_time()
         start_bot()
     except KeyboardInterrupt:
         logging.info("Bot stopped by the user.")
