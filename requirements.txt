@@ -3,6 +3,7 @@ aria2p==0.9.1
 hachoir
 Pillow
 pyrogram==1.3.0
+ntplib==0.3.4
 tgcrypto
 yt_dlp
 hurry.filesize
