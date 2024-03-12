@@ -67,179 +67,72 @@ from tobrot.plugins.status_message_fn import (
     upload_as_video
 )
 
+def start_bot():
+    try:
+        # create download directory, if not exist
+        if not os.path.isdir(DOWNLOAD_LOCATION):
+            os.makedirs(DOWNLOAD_LOCATION)
+
+        # Starting The Bot
+        app.start()
+
+        # Adding message handlers
+        add_message_handlers()
+
+        # Logging
+        logging.info(f"@{(app.get_me()).username} has started running...🏃💨💨 Now gimme 100$ 🐸")
+
+        # Idle
+        idle()
+
+    except Exception as e:
+        logging.exception("An error occurred while starting the bot:")
+        sys.exit(1)
+
+    finally:
+        # Stop the app
+        app.stop()
+
+def add_message_handlers():
+    try:
+        handlers = [
+            (MessageHandler(incoming_message_f, filters=filters.command([LEECH_COMMAND, LEECH_UNZIP_COMMAND, LEECH_ZIP_COMMAND, GLEECH_COMMAND, GLEECH_UNZIP_COMMAND, GLEECH_ZIP_COMMAND]) & filters.chat(chats=AUTH_CHANNEL))),
+            (MessageHandler(down_load_media_f, filters=filters.command([TELEGRAM_LEECH_COMMAND, TELEGRAM_LEECH_UNZIP_COMMAND]) & filters.chat(chats=AUTH_CHANNEL))),
+            (MessageHandler(incoming_purge_message_f, filters=filters.command(["purge"]) & filters.chat(chats=AUTH_CHANNEL))),
+            (MessageHandler(g_clonee, filters=filters.command([f"{CLONE_COMMAND_G}"]) & filters.chat(chats=AUTH_CHANNEL))),
+            (MessageHandler(check_size_g, filters=filters.command([f"{GET_SIZE_G}"]) & filters.chat(chats=AUTH_CHANNEL))),
+            (MessageHandler(g_clearme, filters=filters.command([f"{RENEWME_COMMAND}"]) & filters.chat(chats=AUTH_CHANNEL))),
+            (MessageHandler(incoming_youtube_dl_f, filters=filters.command([YTDL_COMMAND, GYTDL_COMMAND]) & filters.chat(chats=AUTH_CHANNEL))),
+            (MessageHandler(g_yt_playlist, filters=filters.command([PYTDL_COMMAND, GPYTDL_COMMAND]) & filters.chat(chats=AUTH_CHANNEL))),
+            (MessageHandler(status_message_f, filters=filters.command([f"{STATUS_COMMAND}"]) & filters.chat(chats=AUTH_CHANNEL))),
+            (MessageHandler(cancel_message_f, filters=filters.command([f"{CANCEL_COMMAND_G}"]) & filters.chat(chats=AUTH_CHANNEL))),
+            (MessageHandler(exec_message_f, filters=filters.command(["exec"]) & filters.chat(chats=AUTH_CHANNEL))),
+            (MessageHandler(eval_message_f, filters=filters.command(["eval"]) & filters.chat(chats=AUTH_CHANNEL))),
+            (MessageHandler(rename_tg_file, filters=filters.command([f"{RENAME_COMMAND}"]) & filters.chat(chats=AUTH_CHANNEL))),
+            (MessageHandler(upload_document_f, filters=filters.command([f"{UPLOAD_COMMAND}"]) & filters.chat(chats=AUTH_CHANNEL))),
+            (MessageHandler(upload_log_file, filters=filters.command([f"{LOG_COMMAND}"]) & filters.chat(chats=AUTH_CHANNEL))),
+            (MessageHandler(help_message_f, filters=filters.command([f"{HELP_COMMAND}"]) & filters.chat(chats=AUTH_CHANNEL))),
+            (MessageHandler(new_join_f, filters=~filters.chat(chats=AUTH_CHANNEL))),
+            (CallbackQueryHandler(button)),
+            (MessageHandler(save_thumb_nail, filters=filters.command([f"{SAVE_THUMBNAIL}"]) & filters.chat(chats=AUTH_CHANNEL))),
+            (MessageHandler(clear_thumb_nail, filters=filters.command([f"{CLEAR_THUMBNAIL}"]) & filters.chat(chats=AUTH_CHANNEL))),
+            (MessageHandler(rclone_command_f, filters=filters.command([f"{RCLONE_COMMAND}"]))),
+            (MessageHandler(upload_as_doc, filters=filters.command([f"{TOGGLE_DOC}"]) & filters.chat(chats=AUTH_CHANNEL))),
+            (MessageHandler(upload_as_video, filters=filters.command([f"{TOGGLE_VID}"]) & filters.chat(chats=AUTH_CHANNEL))),
+        ]
+
+        for handler in handlers:
+            app.add_handler(handler)
+
+    except Exception as e:
+        logging.exception("An error occurred while adding message handlers:")
+
 if __name__ == "__main__":
-    # create download directory, if not exist
-    if not os.path.isdir(DOWNLOAD_LOCATION):
-        os.makedirs(DOWNLOAD_LOCATION)
-    # Starting The Bot
-    app.start()
-    ##############################################################################
-    incoming_message_handler = MessageHandler(
-        incoming_message_f,
-        filters=filters.command(
-            [
-                LEECH_COMMAND,
-                LEECH_UNZIP_COMMAND,
-                LEECH_ZIP_COMMAND,
-                GLEECH_COMMAND,
-                GLEECH_UNZIP_COMMAND,
-                GLEECH_ZIP_COMMAND,
-            ]
-        )
-        & filters.chat(chats=AUTH_CHANNEL),
-    )
-    app.add_handler(incoming_message_handler)
-    ##############################################################################
-    incoming_telegram_download_handler = MessageHandler(
-        down_load_media_f,
-        filters=filters.command([TELEGRAM_LEECH_COMMAND, TELEGRAM_LEECH_UNZIP_COMMAND])
-        & filters.chat(chats=AUTH_CHANNEL),
-    )
-    app.add_handler(incoming_telegram_download_handler)
-    ##############################################################################
-    incoming_purge_message_handler = MessageHandler(
-        incoming_purge_message_f,
-        filters=filters.command(["purge"]) & filters.chat(chats=AUTH_CHANNEL),
-    )
-    app.add_handler(incoming_purge_message_handler)
-    ##############################################################################
-    incoming_clone_handler = MessageHandler(
-        g_clonee,
-        filters=filters.command([f"{CLONE_COMMAND_G}"])
-        & filters.chat(chats=AUTH_CHANNEL),
-    )
-    app.add_handler(incoming_clone_handler)
-    ##############################################################################
-    incoming_size_checker_handler = MessageHandler(
-        check_size_g,
-        filters=filters.command([f"{GET_SIZE_G}"]) & filters.chat(chats=AUTH_CHANNEL),
-    )
-    app.add_handler(incoming_size_checker_handler)
-    ##############################################################################
-    incoming_g_clear_handler = MessageHandler(
-        g_clearme,
-        filters=filters.command([f"{RENEWME_COMMAND}"])
-        & filters.chat(chats=AUTH_CHANNEL),
-    )
-    app.add_handler(incoming_g_clear_handler)
-    ##############################################################################
-    incoming_youtube_dl_handler = MessageHandler(
-        incoming_youtube_dl_f,
-        filters=filters.command([YTDL_COMMAND, GYTDL_COMMAND])
-        & filters.chat(chats=AUTH_CHANNEL),
-    )
-    app.add_handler(incoming_youtube_dl_handler)
-    ##############################################################################
-    incoming_youtube_playlist_dl_handler = MessageHandler(
-        g_yt_playlist,
-        filters=filters.command([PYTDL_COMMAND, GPYTDL_COMMAND])
-        & filters.chat(chats=AUTH_CHANNEL),
-    )
-    app.add_handler(incoming_youtube_playlist_dl_handler)
-    ##############################################################################
-    status_message_handler = MessageHandler(
-        status_message_f,
-        filters=filters.command([f"{STATUS_COMMAND}"])
-        & filters.chat(chats=AUTH_CHANNEL),
-    )
-    app.add_handler(status_message_handler)
-    ##############################################################################
-    cancel_message_handler = MessageHandler(
-        cancel_message_f,
-        filters=filters.command([f"{CANCEL_COMMAND_G}"])
-        & filters.chat(chats=AUTH_CHANNEL),
-    )
-    app.add_handler(cancel_message_handler)
-    ##############################################################################
-    exec_message_handler = MessageHandler(
-        exec_message_f,
-        filters=filters.command(["exec"]) & filters.chat(chats=AUTH_CHANNEL),
-    )
-    app.add_handler(exec_message_handler)
-    ##############################################################################
-    eval_message_handler = MessageHandler(
-        eval_message_f,
-        filters=filters.command(["eval"]) & filters.chat(chats=AUTH_CHANNEL),
-    )
-    app.add_handler(eval_message_handler)
-    ##############################################################################
-    rename_message_handler = MessageHandler(
-        rename_tg_file,
-        filters=filters.command([f"{RENAME_COMMAND}"]) & filters.chat(chats=AUTH_CHANNEL),
-    )
-    app.add_handler(rename_message_handler)
-    ##############################################################################
-    upload_document_handler = MessageHandler(
-        upload_document_f,
-        filters=filters.command([f"{UPLOAD_COMMAND}"])
-        & filters.chat(chats=AUTH_CHANNEL),
-    )
-    app.add_handler(upload_document_handler)
-    ##############################################################################
-    upload_log_handler = MessageHandler(
-        upload_log_file,
-        filters=filters.command([f"{LOG_COMMAND}"]) & filters.chat(chats=AUTH_CHANNEL),
-    )
-    app.add_handler(upload_log_handler)
-    ##############################################################################
-    help_text_handler = MessageHandler(
-        help_message_f,
-        filters=filters.command([f"{HELP_COMMAND}"]) & filters.chat(chats=AUTH_CHANNEL),
-    )
-    app.add_handler(help_text_handler)
-    ##############################################################################
-    new_join_handler = MessageHandler(
-        new_join_f, filters=~filters.chat(chats=AUTH_CHANNEL)
-    )
-    app.add_handler(new_join_handler)
-    ##############################################################################
-    '''
-    group_new_join_handler = MessageHandler(
-        help_message_f,
-        filters=filters.chat(chats=AUTH_CHANNEL) & filters.new_chat_members,
-    )
-    app.add_handler(group_new_join_handler)
-    '''
-    ##############################################################################
-    call_back_button_handler = CallbackQueryHandler(button)
-    app.add_handler(call_back_button_handler)
-    ##############################################################################
-    save_thumb_nail_handler = MessageHandler(
-        save_thumb_nail,
-        filters=filters.command([f"{SAVE_THUMBNAIL}"])
-        & filters.chat(chats=AUTH_CHANNEL),
-    )
-    app.add_handler(save_thumb_nail_handler)
-    ##############################################################################
-    clear_thumb_nail_handler = MessageHandler(
-        clear_thumb_nail,
-        filters=filters.command([f"{CLEAR_THUMBNAIL}"])
-        & filters.chat(chats=AUTH_CHANNEL),
-    )
-    app.add_handler(clear_thumb_nail_handler)
-    ##############################################################################
-    rclone_config_handler = MessageHandler(
-        rclone_command_f, filters=filters.command([f"{RCLONE_COMMAND}"])
-    )
-    app.add_handler(rclone_config_handler)
-    ##############################################################################
-    upload_as_doc_handler = MessageHandler(
-        upload_as_doc,
-        filters=filters.command([f"{TOGGLE_DOC}"])
-        & filters.chat(chats=AUTH_CHANNEL),
-    )
-    app.add_handler(upload_as_doc_handler)
-    ##############################################################################
-    upload_as_video_handler = MessageHandler(
-        upload_as_video,
-        filters=filters.command([f"{TOGGLE_VID}"])
-        & filters.chat(chats=AUTH_CHANNEL),
-    )
-    app.add_handler(upload_as_video_handler)
-    ##############################################################################
-    
-    logging.info(f"@{(app.get_me()).username} Has Started Running...🏃💨💨 Now gimme 100$ 🐸")
-    
-    idle()
-    
-    app.stop()
+    logging.basicConfig(level=logging.INFO)
+
+    try:
+        start_bot()
+    except KeyboardInterrupt:
+        logging.info("Bot stopped by the user.")
+    except Exception as e:
+        logging.exception("An error occurred while running the bot:")
